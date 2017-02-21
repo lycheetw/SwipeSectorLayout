@@ -15,7 +15,18 @@
         android:layout_height="300dp"
         android:id="@+id/container"
         app:item_width="80dp"
-        app:sector_degree="90"
-        app:sector_height="25dp"
+        app:sector_inner_degree="100"
+        app:sector_outer_degree="60"
+        app:sector_height="70dp"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/container"
+        android:layout_marginBottom="20dp"
+        android:id="@+id/pokemon_name"
+        android:text="pokemon_name"
+        android:textSize="20sp"
+        android:layout_centerHorizontal="true"
         />
 </RelativeLayout>

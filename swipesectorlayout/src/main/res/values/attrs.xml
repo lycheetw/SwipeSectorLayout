@@ -2,7 +2,8 @@
 <resources>
     <declare-styleable name="SwipeSectorLayout">
         <attr name="item_width" format="dimension"/>
-        <attr name="sector_degree" format="integer"/>
+        <attr name="sector_inner_degree" format="integer"/>
+        <attr name="sector_outer_degree" format="integer"/>
         <attr name="sector_color" format="color"/>
         <attr name="sector_height" format="dimension"/>
     </declare-styleable>

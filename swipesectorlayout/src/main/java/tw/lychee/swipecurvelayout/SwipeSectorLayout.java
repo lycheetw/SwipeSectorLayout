@@ -19,7 +19,8 @@ public class SwipeSectorLayout extends RelativeLayout {
     private ArrayList<ImagePair> mItems;
     private OnPageChangeListener mListener;
     private int ITEM_VIEW_WIDTH;
-    private int DEGREE_UNIT;
+    private int INNER_DEGREE_UNIT;
+    private int OUTER_DEGREE_UNIT;
     private int SECTOR_COLOR;
     private int SECTOR_Height;
     private boolean childViewInit = false;
@@ -36,7 +37,9 @@ public class SwipeSectorLayout extends RelativeLayout {
         super(context, attrs, defStyleAttr);
         TypedArray ta = context.obtainStyledAttributes(attrs,
                 R.styleable.SwipeSectorLayout, 0, 0);
-        DEGREE_UNIT = ta.getInteger(R.styleable.SwipeSectorLayout_sector_degree, 90) / 2;
+        int inner_degree = ta.getInteger(R.styleable.SwipeSectorLayout_sector_inner_degree, 90);
+        INNER_DEGREE_UNIT = inner_degree / 2;
+        OUTER_DEGREE_UNIT = ta.getInteger(R.styleable.SwipeSectorLayout_sector_outer_degree, inner_degree) / 2;
         ITEM_VIEW_WIDTH = ta.getDimensionPixelSize(R.styleable.SwipeSectorLayout_item_width, 200);
         SECTOR_COLOR = ta.getColor(R.styleable.SwipeSectorLayout_sector_color, 0xFFFFFFFF);
         SECTOR_Height = ta.getDimensionPixelSize(R.styleable.SwipeSectorLayout_sector_height, 0);
@@ -48,11 +51,13 @@ public class SwipeSectorLayout extends RelativeLayout {
 
     public void addItem(@NonNull ImagePair item) {
         mItems.add(item);
-        mViewPager.getAdapter().notifyDataSetChanged();
     }
 
     public void addItems(@NonNull ArrayList<ImagePair> items) {
         mItems.addAll(items);
+    }
+
+    public void notifyDataSetChanged() {
         mViewPager.getAdapter().notifyDataSetChanged();
     }
 
@@ -96,19 +101,7 @@ public class SwipeSectorLayout extends RelativeLayout {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             if(!childViewInit){
-                LayoutParams params = (LayoutParams)mCoverImage.getLayoutParams();
-                int w = mViewPager.getWidth() / 2;
-                double r = w / Math.sin(Math.toRadians(DEGREE_UNIT));
-                params.width = (int)Math.round(r * 2);
-                params.height = (int)Math.round(r * 2);
-                params.bottomMargin = - (int)Math.round(r + r * Math.sin(Math.toRadians(DEGREE_UNIT)) - SECTOR_Height );
-                params.leftMargin = - (int)Math.round(r - w);
-                params.rightMargin = - (int)Math.round(r - w);
-
-                for(int i = 0; i < mViews.size(); i ++) {
-                    setLocation(mViews.get(i), positionOffset, i - 2);
-                }
-                setViewImage(0);
+                initChildView();
                 childViewInit = true;
             }
 
@@ -137,6 +130,22 @@ public class SwipeSectorLayout extends RelativeLayout {
         }
     }
 
+    private void initChildView() {
+        LayoutParams params = (LayoutParams)mCoverImage.getLayoutParams();
+        int w = mViewPager.getWidth() / 2;
+        double r = w / Math.sin(Math.toRadians(OUTER_DEGREE_UNIT));
+        params.width = (int)Math.round(r * 2);
+        params.height = (int)Math.round(r * 2);
+        params.bottomMargin = - (int)Math.round(r + r * Math.cos(Math.toRadians(OUTER_DEGREE_UNIT)) - SECTOR_Height );
+        params.leftMargin = - (int)Math.round(r - w);
+        params.rightMargin = - (int)Math.round(r - w);
+
+        for(int i = 0; i < mViews.size(); i ++) {
+            setLocation(mViews.get(i), 0, i - 2);
+        }
+        setViewImage(0);
+    }
+
     private void setViewLocation(float percentage) {
         for(int i = 0; i < mViews.size(); i ++) {
             setLocation(mViews.get(i), percentage, i - 2);
@@ -146,17 +155,17 @@ public class SwipeSectorLayout extends RelativeLayout {
     private void setLocation(View view, float percentage, int position) {
         final int windowWidth = mViewPager.getWidth();
         final int halfWindowWidth = windowWidth / 2;
-        final int radius = (int)Math.round(halfWindowWidth / Math.sin(Math.toRadians(DEGREE_UNIT)));
+        final int radius = (int)Math.round(halfWindowWidth / Math.sin(Math.toRadians(INNER_DEGREE_UNIT)));
         final float HORIZON_SCALE = 1.1f;
 
-        final float degree = DEGREE_UNIT * position - DEGREE_UNIT * percentage;
+        final float degree = INNER_DEGREE_UNIT * position - INNER_DEGREE_UNIT * percentage;
         view.setRotation(degree);
         LayoutParams params = (LayoutParams)view.getLayoutParams();
         int left = (int)Math.round(
                 halfWindowWidth + HORIZON_SCALE * radius * Math.sin(Math.toRadians(degree)) - ITEM_VIEW_WIDTH / 2
         );
         int bottom = (int)Math.round(
-                radius * Math.cos(Math.toRadians(degree)) - radius * Math.cos(Math.toRadians(DEGREE_UNIT))
+                radius * Math.cos(Math.toRadians(degree)) - radius * Math.cos(Math.toRadians(INNER_DEGREE_UNIT))
         );
 
         params.leftMargin = left;

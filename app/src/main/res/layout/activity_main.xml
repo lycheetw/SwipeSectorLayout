@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/activity_main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.swipesectorlayout.MainActivity"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/white"
+    >
+
+    <tw.lychee.swipecurvelayout.SwipeSectorLayout
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:id="@+id/container"
+        app:item_width="80dp"
+        app:sector_degree="90"
+        app:sector_height="25dp"
+        />
+</RelativeLayout>

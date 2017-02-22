@@ -38,7 +38,7 @@ swipeSectorLayout.setAdapter(new ImageAdapter() {
 swipeSectorLayout.setOnPageChangeListener(new SwipeSectorLayout.OnPageChangeListener() {
     @Override
     public void onPageSelected(int position) {
-        mNameTv.setText(mPokemons.get(position).getName());
+        
     }
 });
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -21,7 +22,7 @@ public class SwipeSectorLayout extends RelativeLayout {
     private int mSectorHeight;
     private boolean childViewInit = false;
     private ImageAdapter mAdapter;
-    private final float DELAY = 0.2f;
+    private final float DELAY = 0.05f;
     private final int ITEM_VIEW_COUNTS = 5;
 
 
@@ -124,22 +125,17 @@ public class SwipeSectorLayout extends RelativeLayout {
 
         final float degree = mInnerDegreeUnit * position - mInnerDegreeUnit * percentage;
         view.setRotation(degree);
-        LayoutParams params = (LayoutParams)view.getLayoutParams();
+
         int left = (int)Math.round(
                 halfWindowWidth + HORIZON_SCALE * radius * Math.sin(Math.toRadians(degree)) - mItemViewWidth / 2
         );
         int bottom = (int)Math.round(
                 radius * Math.cos(Math.toRadians(degree)) - radius * Math.cos(Math.toRadians(mInnerDegreeUnit))
         );
+        view.setTranslationX(left);
+        view.setTranslationY(-bottom);
 
-        params.leftMargin = left;
-        if(left + mItemViewWidth > windowWidth){
-            params.rightMargin = -(left + mItemViewWidth - windowWidth);
-        }
-        params.bottomMargin = bottom;
-        view.setLayoutParams(params);
-
-        //Log.d("setting", String.format("degree: %.2f, (%d, %d)", degree, left, bottom));
+        //Log.d("setting", String.format("(%d) degree: %.4f, position: (%d, %d)",position, degree, left, bottom));
     }
 
     private void setViewImage(int currIdx) {
@@ -173,6 +169,7 @@ public class SwipeSectorLayout extends RelativeLayout {
 
     class PageChangeListener implements ViewPager.OnPageChangeListener {
         private float mPreOffset = 0;
+        private int mPrePosition = 0;
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             if(!childViewInit){
@@ -184,9 +181,9 @@ public class SwipeSectorLayout extends RelativeLayout {
                 return;
             }
 
-            if((positionOffset >= 0.9 && positionOffset < 1) ||
-                    (positionOffset > 0 && positionOffset <= 0.1)){
+            if(mPrePosition != position){
                 setViewImage(position);
+                mPrePosition = position;
             }
 
             if(mPreOffset == 0){

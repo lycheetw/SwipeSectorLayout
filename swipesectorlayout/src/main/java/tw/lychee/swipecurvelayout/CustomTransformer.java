@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-class PageTransformer implements ViewPager.PageTransformer{
+class CustomTransformer implements ViewPager.PageTransformer{
     private static final float MIN_ALPHA = 0.3f;
     private static final float DEFAULT_SCALE = 1.2f;
 

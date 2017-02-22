@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
 import java.util.ArrayList;
 
 public class SwipeSectorLayout extends RelativeLayout {
-    private ViewPager mViewPager;
+    private CustomPager mViewPager;
     private ImageView mCoverImage;
     private ArrayList<ImageView> mViews;
     private Context mContext;
@@ -64,14 +64,15 @@ public class SwipeSectorLayout extends RelativeLayout {
     private void init() {
         mItems = new ArrayList<>();
 
-        SwipePagerAdapter adapter = new SwipePagerAdapter(mItems);
+        CustomPagerAdapter adapter = new CustomPagerAdapter(mItems);
 
         LayoutParams pagerParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        mViewPager = new ViewPager(mContext);
+        mViewPager = new CustomPager(mContext);
         mViewPager.setAdapter(adapter);
         mViewPager.addOnPageChangeListener(new PageChangeListener());
         mViewPager.setLayoutParams(pagerParams);
-        mViewPager.setPageTransformer(false, new PageTransformer());
+        mViewPager.setPageTransformer(false, new CustomTransformer());
+        mViewPager.setScrollDurationFactor(1.8);
         addView(mViewPager);
 
         mCoverImage = new ImageView(mContext);
@@ -98,6 +99,7 @@ public class SwipeSectorLayout extends RelativeLayout {
 
 
     class PageChangeListener implements ViewPager.OnPageChangeListener {
+        private float mPreOffset = 0;
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             if(!childViewInit){
@@ -106,6 +108,7 @@ public class SwipeSectorLayout extends RelativeLayout {
             }
 
             if(positionOffset > 0.9999 || positionOffset == 0){
+                mPreOffset = 0;
                 return;
             }
 
@@ -114,7 +117,22 @@ public class SwipeSectorLayout extends RelativeLayout {
                 setViewImage(position);
             }
 
-            setViewLocation(positionOffset);
+            float delay = 0.2f;
+            if(mPreOffset == 0){
+
+            } else if(mPreOffset < positionOffset) {
+                //right
+                float percentage = positionOffset / (1 - delay);
+                percentage = percentage >= 1 ? 1 : percentage;
+                setViewLocation(percentage);
+            } else {
+                //left
+                float percentage = (positionOffset - delay) / (1 - delay);
+                percentage = percentage <= 0 ? 0 : percentage;
+                setViewLocation(percentage);
+            }
+            mPreOffset = positionOffset;
+
 
 
         }

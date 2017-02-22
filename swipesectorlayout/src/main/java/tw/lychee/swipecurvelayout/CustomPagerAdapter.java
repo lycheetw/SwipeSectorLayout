@@ -8,10 +8,10 @@ import android.widget.ImageView;
 
 import java.util.ArrayList;
 
-class SwipePagerAdapter extends PagerAdapter {
+class CustomPagerAdapter extends PagerAdapter {
     private ArrayList<ImagePair> mItems;
 
-    SwipePagerAdapter(ArrayList<ImagePair> items) {
+    CustomPagerAdapter(ArrayList<ImagePair> items) {
         mItems = items;
     }
 

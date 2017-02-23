@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
 public class SwipeSectorLayout extends RelativeLayout {
     private CustomPager mViewPager;
     private ImageView mCoverImage;
-    private ImageView mViews[];
+    private CircularArrayList<ImageView> mReusableViews;
     private Context mContext;
     private OnPageChangeListener mListener;
     private int mItemViewWidth;
@@ -72,15 +72,17 @@ public class SwipeSectorLayout extends RelativeLayout {
         mCoverImage.setScaleType(ImageView.ScaleType.FIT_XY);
         addView(mCoverImage);
 
-        mViews = new ImageView[ITEM_VIEW_COUNTS];
-        for(int i = 0; i < mViews.length; i++){
-            mViews[i] = new ImageView(mContext);
+        mReusableViews = new CircularArrayList<>();
+        for(int i = 0; i < ITEM_VIEW_COUNTS; i++){
+            ImageView view = new ImageView(mContext);
             LayoutParams itemParams = new LayoutParams(mItemViewWidth, mItemViewWidth);
             itemParams.addRule(ALIGN_PARENT_LEFT);
             itemParams.addRule(ALIGN_PARENT_BOTTOM);
-            mViews[i].setLayoutParams(itemParams);
-            addView(mViews[i]);
+            view.setLayoutParams(itemParams);
+            addView(view);
+            mReusableViews.add(view);
         }
+
     }
 
     public void setAdapter(ImageAdapter adapter) {
@@ -104,62 +106,51 @@ public class SwipeSectorLayout extends RelativeLayout {
         params.leftMargin = - (int)Math.round(r - w);
         params.rightMargin = - (int)Math.round(r - w);
 
-        for(int i = 0; i < mViews.length; i ++) {
-            setLocation(mViews[i], 0, i - 2);
-        }
+        setViewLocation(0);
         setViewImage(0);
         childViewInit = true;
     }
 
     private void setViewLocation(float percentage) {
-        for(int i = 0; i < mViews.length; i ++) {
-            setLocation(mViews[i], percentage, i - 2);
-        }
-    }
-
-    private void setLocation(View view, float percentage, int position) {
         final int windowWidth = mViewPager.getWidth();
         final int halfWindowWidth = windowWidth / 2;
         final int radius = (int)Math.round(halfWindowWidth / Math.sin(Math.toRadians(mInnerDegreeUnit)));
         final float HORIZON_SCALE = 1.1f;
 
-        final float degree = mInnerDegreeUnit * position - mInnerDegreeUnit * percentage;
-        view.setRotation(degree);
+        for(int i = 0; i < mReusableViews.size(); i++) {
+            View view = mReusableViews.get(i);
+            float degree = mInnerDegreeUnit * i - mInnerDegreeUnit * percentage;
+            int threshold = mInnerDegreeUnit * (mReusableViews.size() - 1);
 
-        int left = (int)Math.round(
-                halfWindowWidth + HORIZON_SCALE * radius * Math.sin(Math.toRadians(degree)) - mItemViewWidth / 2
-        );
-        int bottom = (int)Math.round(
-                radius * Math.cos(Math.toRadians(degree)) - radius * Math.cos(Math.toRadians(mInnerDegreeUnit))
-        );
-        view.setTranslationX(left);
-        view.setTranslationY(-bottom);
+            while(Math.abs(degree) >= threshold) {
+                if(degree < 0)
+                    degree += (mReusableViews.size())* mInnerDegreeUnit;
+                else
+                    degree -= (mReusableViews.size()) * mInnerDegreeUnit;
+            }
 
-        //Log.d("setting", String.format("(%d) degree: %.4f, position: (%d, %d)",position, degree, left, bottom));
+            view.setRotation(degree);
+            int left = (int)Math.round(
+                    halfWindowWidth + HORIZON_SCALE * radius * Math.sin(Math.toRadians(degree)) - mItemViewWidth / 2
+            );
+            int bottom = (int)Math.round(
+                    radius * Math.cos(Math.toRadians(degree)) - radius * Math.cos(Math.toRadians(mInnerDegreeUnit))
+            );
+            view.setTranslationX(left);
+            view.setTranslationY(-bottom);
+
+            //Log.d("setting", String.format("(%d) degree: %.4f, position: (%d, %d)", i, degree, left, bottom));
+        }
     }
 
     private void setViewImage(int currIdx) {
-        //This rule is base on ITEM_VIEW_COUNTS = 5
-        int start, itemIdx, end;
-        if(currIdx == 0) {
-            start = 2; itemIdx = currIdx; end = 4;
-        } else if(currIdx == 1) {
-            start = 1; itemIdx = currIdx - 1; end = 4;
-        } else if(currIdx == mAdapter.getCount() - 1) {
-            start = 0; itemIdx = currIdx - 2; end = 2;
-        } else if(currIdx == mAdapter.getCount() - 2) {
-            start = 0; itemIdx = currIdx - 2; end = 3;
-        } else {
-            start = 0; itemIdx = currIdx - 2; end = 4;
-        }
-        for(int i = start, j = itemIdx; i <= end && j < mAdapter.getCount(); i++, j++) {
-            mAdapter.setItemView(j, mViews[i]);
-        }
-        for(int i = 0; i < start; i++){
-            mViews[i].setImageResource(0);
-        }
-        for(int i = end + 1; i < mViews.length; i++){
-            mViews[i].setImageResource(0);
+        int t = (mReusableViews.size() - 1) / 2;
+        for(int i = currIdx - t; i <= currIdx + t; i++) {
+            if(i < 0 || i > mAdapter.getCount() - 1) {
+                mReusableViews.get(i).setImageResource(0);
+            } else {
+                mAdapter.setItemView(i, mReusableViews.get(i));
+            }
         }
     }
 
@@ -181,7 +172,7 @@ public class SwipeSectorLayout extends RelativeLayout {
                 return;
             }
 
-            if(mPrePosition != position){
+            if(mPrePosition != position) {
                 setViewImage(position);
                 mPrePosition = position;
             }
@@ -192,12 +183,12 @@ public class SwipeSectorLayout extends RelativeLayout {
                 //right
                 float percentage = positionOffset / (1 - DELAY);
                 percentage = percentage >= 1 ? 1 : percentage;
-                setViewLocation(percentage);
+                setViewLocation(position + percentage);
             } else {
                 //left
                 float percentage = (positionOffset - DELAY) / (1 - DELAY);
                 percentage = percentage <= 0 ? 0 : percentage;
-                setViewLocation(percentage);
+                setViewLocation(position + percentage);
             }
             mPreOffset = positionOffset;
         }

@@ -15,10 +15,20 @@
         android:layout_height="300dp"
         android:id="@+id/container"
         app:item_width="80dp"
-        app:sector_inner_degree="100"
-        app:sector_outer_degree="60"
-        app:sector_height="70dp"
-        />
+        app:degree="100"
+        >
+        <!--Custom Semi-circular -->
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/circle"
+            android:layout_marginBottom="-490dp"
+            android:layout_marginLeft="-200dp"
+            android:layout_marginRight="-200dp"
+            />
+    </tw.lychee.swipecurvelayout.SwipeSectorLayout>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

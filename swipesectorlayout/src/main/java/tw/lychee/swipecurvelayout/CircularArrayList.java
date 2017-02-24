@@ -20,6 +20,10 @@ class CircularArrayList<T> {
         return mItems.get(idx);
     }
 
+    ArrayList<T> getAll() {
+        return mItems;
+    }
+
     int size() {
         return mItems.size();
     }

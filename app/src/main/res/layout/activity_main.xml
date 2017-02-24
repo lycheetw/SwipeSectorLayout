@@ -24,7 +24,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:src="@drawable/circle"
-            android:layout_marginBottom="-490dp"
+            android:layout_marginBottom="-680dp"
             android:layout_marginLeft="-200dp"
             android:layout_marginRight="-200dp"
             />

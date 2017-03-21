@@ -1,13 +1,16 @@
 # SwipeSectorLayout
 The inspiration for this project comes from [Dima Panchenko's post on Dribbble](https://dribbble.com/shots/3272140-Jewelry-E-ommerce-Application).
 
-##Gradle
+## Screenshots
+![alt tag](https://raw.githubusercontent.com/lycheetw/SwipeSectorLayout/master/images/screenshot.gif)
+
+## Gradle
 ```groovy
 compile 'tw.lychee:SwipeSectorLayout:1.1.0'
 ```
 
-##Usage
-####layout
+## Usage
+#### layout
 ```xml
 <tw.lychee.swipecurvelayout.SwipeSectorLayout
       android:layout_width="match_parent"
@@ -30,7 +33,7 @@ compile 'tw.lychee:SwipeSectorLayout:1.1.0'
 </tw.lychee.swipecurvelayout.SwipeSectorLayout>
 ```
 
-####code
+#### code
 ```java
 SwipeSectorLayout swipeSectorLayout = (SwipeSectorLayout) findViewById(R.id.container);
 swipeSectorLayout.setAdapter(new ImageAdapter() {
@@ -59,8 +62,5 @@ swipeSectorLayout.setOnPageChangeListener(new SwipeSectorLayout.OnPageChangeList
 
 ```
 
-
-## Screenshots
-![alt tag](https://raw.githubusercontent.com/lycheetw/SwipeSectorLayout/master/images/screenshot.gif)
 
 You can find complete demo code [here](https://github.com/lycheetw/SwipeSectorLayout/tree/master/app/src/main)
